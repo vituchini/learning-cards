@@ -17,8 +17,10 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import {useAppDispatch, useAppSelector} from '../../bll/store';
 import {Button, TableHead} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {addPacksTC, deletePacksTC, updatePacksTC} from '../../bll/reducers/packs-reducer';
+import {addPacksTC, deletePacksTC} from '../../bll/reducers/packs-reducer';
 import CreateIcon from '@mui/icons-material/Create';
+import {useNavigate} from 'react-router-dom';
+import styles from './PacksTable.module.css'
 
 interface TablePaginationActionsProps {
     count: number;
@@ -87,9 +89,9 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 export const PacksTable = () => {
+    const navigate = useNavigate()
     const dispatch = useAppDispatch()
     const packs = useAppSelector(state => state.packs.cardPacks)
-    //console.log(packs)
     const [page, setPage] = React.useState(0);
     const [packsPerPage, setPacksPerPage] = React.useState(5);
 
@@ -114,9 +116,10 @@ export const PacksTable = () => {
     const deletePack = (packId: string) => {
         dispatch(deletePacksTC(packId))
     }
-    // const deletePack = (packId: string) => {
-    //     cardsPack_id && dispatch(deleteCardTC(cardsPack_id, cardId))
-    // }
+
+    const openCards = (packId: string, packName: string) => {
+        navigate(`/cards/${packName}~${packId}`)
+    }
 
     return (
         <TableContainer component={Paper}>
@@ -125,10 +128,10 @@ export const PacksTable = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        <TableCell align="right">Cards</TableCell>
-                        <TableCell align="right">Created By</TableCell>
-                        <TableCell align="right">Updated</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell align="center">Cards</TableCell>
+                        <TableCell align="center">Created By</TableCell>
+                        <TableCell align="center">Updated</TableCell>
+                        <TableCell align="center">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -138,23 +141,24 @@ export const PacksTable = () => {
                     ).map((pack) => (
                         <TableRow key={pack._id}>
                             <TableCell component="th" scope="row">
-                                {pack.name}
+                                <div onClick={() => openCards(pack._id, pack.name)} className={styles.openPack}>
+                                    {pack.name}
+                                </div>
                             </TableCell>
-                            <TableCell style={{width: 160}} align="right">
+                            <TableCell align="center">
                                 {pack.cardsCount}
                             </TableCell>
-                            <TableCell style={{width: 160}} align="right">
+                            <TableCell align="center">
                                 {pack.user_name}
                             </TableCell>
-                            <TableCell style={{width: 160}} align="right">
+                            <TableCell align="center">
                                 {pack.updated}
                             </TableCell>
-                            <TableCell style={{width: 160}} align="right">
+                            <TableCell align="center">
                                 <IconButton aria-label="delete" onClick={() => deletePack(pack._id)}>
                                     <DeleteIcon/>
                                 </IconButton>
-                                <IconButton aria-label="delete"
-                                            onClick={() => dispatch(updatePacksTC(pack._id, 'One'))}>
+                                <IconButton aria-label="delete" onClick={() => deletePack(pack._id)}>
                                     <CreateIcon/>
                                 </IconButton>
                             </TableCell>
